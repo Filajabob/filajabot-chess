@@ -38,16 +38,16 @@ def search(board) -> Result:
 
     # Engine is white
     if board.turn == chess.WHITE:
-        result = maxi(Constants.DEPTH, board)
+        result = maxi(Constants.DEPTH, board, float("-inf"), float("inf"))
     else:
-        result = mini(Constants.DEPTH, board)
+        result = mini(Constants.DEPTH, board, float("-inf"), float("inf"))
 
     elapsed_time = time.time() - start_time
 
     filajabot_logger.info(f"Search completed at {board.fen()} at depth {Constants.DEPTH}\n"
-                f"Best move: {result.best_move}\n"
-                f"Nodes searched: {result.nodes}\n"
-                f"Elapsed time: {elapsed_time}\n"
-                f"Seconds per node: {result.nodes / elapsed_time}")
+                          f"\tBest move: {result.best_move}\n"
+                          f"\tNodes searched: {result.nodes}\n"
+                          f"\tElapsed time: {elapsed_time}\n"
+                          f"\tSeconds per node: {elapsed_time / result.nodes}")
 
     return Result(result.score, Constants.DEPTH, result.best_move, None, best_move_san=board.san(result.best_move))
