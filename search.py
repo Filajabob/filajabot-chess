@@ -2,7 +2,6 @@
 Run this file directly while passing a FEN string to get a result.Result
 """
 
-import random
 import time
 import sys
 import chess
@@ -21,7 +20,11 @@ def opening_book(board) -> chess.Move:
     """
 
     reader = chess.polyglot.MemoryMappedReader("assets/book/opening_book.bin")
-    return reader.choice(board).move
+
+    try:
+        return reader.choice(board).move
+    except IndexError:
+        return
 
 
 def search(board, *, log=True, max_depth=Constants.DEPTH, max_time=Constants.SEARCH_TIME) -> Result:
@@ -57,9 +60,16 @@ def search(board, *, log=True, max_depth=Constants.DEPTH, max_time=Constants.SEA
         if elapsed_time > max_time:
             break
 
+    if result.best_move is None:
+        if log:
+            filajabot_logger.debug(f"Engine resigned at {board.fen()} with score {result.score}")
+        return Result(result.score, max_depth, result.best_move, None, best_move_san=board.san(result.best_move),
+                      engine_resign=True)
+
     if log:
         filajabot_logger.info(f"Search completed at {board.fen()} at depth {max_depth}\n"
                               f"\tBest move: {result.best_move}\n"
+                              f"\tScore: {result.score}"
                               f"\tNodes searched: {result.nodes}\n"
                               f"\tElapsed time: {elapsed_time}\n"
                               f"\tTime per 100 nodes: {elapsed_time / result.nodes * 100}")
@@ -68,9 +78,9 @@ def search(board, *, log=True, max_depth=Constants.DEPTH, max_time=Constants.SEA
 
 
 if __name__ == '__main__':
-    # search.exe [FEN] [max_time]
+    # version010.exe [FEN] [max_time]
     board = chess.Board(fen=sys.argv[1])
-    result = search(board, log=False, max_time=sys.argv[2])
+    result = search(board, log=False, max_time=float(sys.argv[2]))
 
     sys.stdout.write(result.best_move_san)
     sys.stdout.flush()

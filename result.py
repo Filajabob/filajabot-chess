@@ -3,7 +3,7 @@ import chess
 
 class Result:
     def __init__(self, score: float, depth: int, best_move: chess.Move=None, nodes: int=0, *, best_move_san: str=None,
-                 mate_in: int=None, elapsed_time: float=None):
+                 mate_in: int=None, elapsed_time: float=None, engine_resign=False):
         """
         The result of a minimax search.
         :param score: float: The score of the position, positive being good for white, and vice versa.
@@ -20,6 +20,7 @@ class Result:
         self.best_move_san = best_move_san
         self.mate_in = mate_in
         self.elapsed_time = elapsed_time
+        self.engine_resign = engine_resign
 
     BOOK = None
     DRAW = 0

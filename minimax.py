@@ -1,3 +1,4 @@
+import random
 import chess
 from evaluate import evaluate
 from result import Result
@@ -19,6 +20,7 @@ def maxi(depth, board, alpha, beta) -> Result:
         nodes_searched += result.nodes
 
         if result.score >= beta:
+            best_move = move
             return Result(beta, depth, best_move, nodes_searched)  # fail hard beta-cutoff
         if result.score > alpha:
             alpha = result.score
@@ -43,6 +45,7 @@ def mini(depth, board, alpha, beta) -> Result:
         nodes_searched += result.nodes
 
         if result.score <= alpha:
+            best_move = move
             return Result(alpha, depth, best_move, nodes_searched)  # fail hard alpha-cutoff
         if result.score < beta:
             beta = result.score
