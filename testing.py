@@ -44,7 +44,7 @@ for i in range(iterations):
 
                 if move not in [board.san(move) for move in board.legal_moves]:
                     engine2_wins += 1
-                    continue
+                    break
             else:
                 move = subprocess.run(
                     [engine2_fp, board.fen(), str(max_time)],

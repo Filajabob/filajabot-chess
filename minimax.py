@@ -2,6 +2,7 @@ import random
 import chess
 from evaluate import evaluate
 from result import Result
+import utils
 
 
 def maxi(depth, board, alpha, beta) -> Result:
@@ -12,7 +13,7 @@ def maxi(depth, board, alpha, beta) -> Result:
 
     best_move = chess.Move.null()
 
-    for move in board.legal_moves:
+    for move in utils.order_moves(board, board.legal_moves):
         board.push(move)
         result = mini(depth - 1, board, alpha, beta)   # Find the opponent's (black's) best move
         board.pop()
@@ -37,7 +38,7 @@ def mini(depth, board, alpha, beta) -> Result:
 
     best_move = chess.Move.null()
 
-    for move in board.legal_moves:
+    for move in utils.order_moves(board, board.legal_moves):
         board.push(move)
         result = maxi(depth - 1, board, alpha, beta)
         board.pop()
