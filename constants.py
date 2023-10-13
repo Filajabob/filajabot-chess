@@ -1,5 +1,6 @@
 class Constants:
-    DEPTH = 3
+    DEPTH = 5  # Maximum depth
+    SEARCH_TIME = 3  # Maximum search time
 
     class PieceValues:
         KING = float("inf")
