@@ -6,11 +6,11 @@ import time
 import sys
 import chess
 import chess.polyglot
+import requests
 from minimax import mini, maxi
 from constants import Constants
 from logger import filajabot_logger
 from result import Result
-
 
 def opening_book(board) -> chess.Move:
     """
@@ -29,7 +29,7 @@ def opening_book(board) -> chess.Move:
 
 def search(board, *, log=True, max_depth=Constants.DEPTH, max_time=Constants.SEARCH_TIME) -> Result:
     """
-    Conducts an iterative-deepening minimax search of a board.
+    Conducts an iterative-deepening minimax search of a board, also including opening/endgame probing.
     :param max_time:
     :param max_depth:
     :param log: bool: Whether to log
@@ -41,6 +41,12 @@ def search(board, *, log=True, max_depth=Constants.DEPTH, max_time=Constants.SEA
 
     if book:
         return Result(Result.BOOK, Constants.DEPTH, book, None, best_move_san=board.san(book))
+    elif sum(1 for square in chess.SQUARES if board.piece_at(square) is not None) <= 7:
+        # probe tablebase
+        r = requests.get(url=f"http://tablebase.lichess.ovh/standard/mainline?fen={board.fen()}")
+        entry = r.json()
+
+        return Result(Result.TABLEBASE, None, chess.Move.from_uci(entry[0]["uci"]))
 
     start_time = time.time()
 

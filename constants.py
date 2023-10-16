@@ -6,7 +6,8 @@ class Constants:
         KING = float("inf")
         QUEEN = 9
         ROOK = 5
-        BISHOP = 3
+        BISHOP = 3.5  # Encourage a bishop pair, making B > N
+        # (https://www.chessprogramming.org/Simplified_Evaluation_Function)
         KNIGHT = 3
         PAWN = 1
 

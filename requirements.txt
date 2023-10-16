@@ -1,2 +1,2 @@
 chess==1.9.0
-chessboard==1.5.4
+chessboard==1.5.4  # only required for testing.py atm

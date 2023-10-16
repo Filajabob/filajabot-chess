@@ -13,6 +13,7 @@ command = [
     "--hidden-import", "constants",
     "--hidden-import", "logger",
     "--hidden-import", "result",
+    "--hidden-import", "requests",
     "--distpath", "testing",
     "--name", f"version{version}",
     "D:/PycharmProjects/FilajabotChess/search.py"

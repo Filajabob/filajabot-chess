@@ -108,7 +108,7 @@ for i in range(iterations):
             else:
                 draws += 1
 
-print("Suite complete.")
+print("Testing complete.")
 print(f"{engine1}: {engine1_wins} wins - {engine2}: {engine2_wins} wins - {draws} draws")
 
 display.terminate()

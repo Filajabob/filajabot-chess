@@ -23,6 +23,7 @@ class Result:
         self.engine_resign = engine_resign
 
     BOOK = None
+    TABLEBASE = None
     DRAW = 0
     WHITE_CHECKMATE = float("inf")
     BLACK_CHECKMATE = float("-inf")

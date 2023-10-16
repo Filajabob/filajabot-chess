@@ -39,4 +39,6 @@ def evaluate(board) -> float:
 
         mobility_score = Constants.PieceValues.MOBILITY * (white_mobility - black_mobility)
 
+        # TODO: Piece value tables / pawn structure / etc.
+
         return material_score + mobility_score
