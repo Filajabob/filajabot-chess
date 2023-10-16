@@ -30,10 +30,10 @@ for i in range(iterations):
     display.update(board.fen(), game_board)
 
     print(f"Match {i}... | {engine1}: {engine1_wins} wins - {engine2}: {engine2_wins} wins - {draws} draws")
-    print(f"{engine1} as white - {engine2} as black")
 
     if i % 2 == 0:
         # engine1 is white
+        print(f"{engine1} as white - {engine2} as black")
 
         start_time = time.time()
         while not board.is_game_over():
@@ -77,6 +77,7 @@ for i in range(iterations):
                 draws += 1
 
     else:
+        print(f"{engine2} as white - {engine1} as black")
         start_time = time.time()
         while not board.is_game_over():
             if board.turn == chess.WHITE:

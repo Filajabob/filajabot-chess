@@ -1,6 +1,6 @@
 import chess
 from constants import Constants
-from result import Result
+import utils
 
 
 def evaluate(board) -> float:
@@ -15,7 +15,7 @@ def evaluate(board) -> float:
             elif outcome.result() == "1/2-1/2":
                 return 0.0
     else:
-        # If the game is not over, evaluate material
+        # If the game is not over, evaluate material / piece value table
         white = board.occupied_co[chess.WHITE]
         black = board.occupied_co[chess.BLACK]
 
@@ -39,6 +39,36 @@ def evaluate(board) -> float:
 
         mobility_score = Constants.PieceValues.MOBILITY * (white_mobility - black_mobility)
 
-        # TODO: Piece value tables / pawn structure / etc.
+        piece_value_table_score = 0
 
-        return material_score + mobility_score
+        for square in chess.SQUARES:
+            piece = board.piece_at(square)
+
+            if piece is not None:
+                if piece.color:
+                    # If the piece is white
+                    if piece.piece_type == chess.KING:
+                        if utils.is_endgame(board):
+                            # In end-game, consult end-game table
+                            piece_value_table_score += \
+                                Constants.PIECE_VALUE_TABLES[str(piece.piece_type)]["end_game"][63 - square] / 100
+                        else:
+                            # In middle/opening (opening will use the opening book), use middle-game table
+                            piece_value_table_score += \
+                                Constants.PIECE_VALUE_TABLES[str(piece.piece_type)]["middle_game"][63 - square] / 100
+                    else:
+                        piece_value_table_score += Constants.PIECE_VALUE_TABLES[str(piece.piece_type)][63 - square] / 100
+                else:
+                    if piece.piece_type == chess.KING:
+                        if utils.is_endgame(board):
+                            # In end-game, consult end-game table
+                            piece_value_table_score -= \
+                                Constants.PIECE_VALUE_TABLES[str(piece.piece_type)]["end_game"][square] / 100
+                        else:
+                            # In middle/opening (opening will use the opening book), use middle-game table
+                            piece_value_table_score -= \
+                                Constants.PIECE_VALUE_TABLES[str(piece.piece_type)]["middle_game"][square] / 100
+                    else:
+                        piece_value_table_score -= Constants.PIECE_VALUE_TABLES[str(piece.piece_type)][square] / 100
+
+        return material_score + mobility_score + piece_value_table_score

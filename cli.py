@@ -2,7 +2,7 @@ import chess
 import chess.pgn
 from search import search
 
-__version__ = '0.1.3'
+__version__ = '0.2.0'
 
 
 def print_board(board):
