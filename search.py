@@ -40,13 +40,18 @@ def search(board, *, log=True, max_depth=Constants.DEPTH, max_time=Constants.SEA
     book = opening_book(board)
 
     if book:
-        return Result(Result.BOOK, Constants.DEPTH, book, None, best_move_san=board.san(book))
-    elif sum(1 for square in chess.SQUARES if board.piece_at(square) is not None) <= 7:
+        return Result(Result.BOOK, Result.BOOK, book, None, best_move_san=board.san(book))
+    if sum([1 for square in chess.SQUARES if board.piece_at(square) is not None]) <= 7:
+        # TODO: find out why 0.1.2 is worse than 0.1.1 (added tablebase probing)
         # probe tablebase
-        r = requests.get(url=f"http://tablebase.lichess.ovh/standard/mainline?fen={board.fen()}")
-        entry = r.json()
+        try:
+            r = requests.get(url=f"http://tablebase.lichess.ovh/standard/mainline?fen={board.fen()}")
+            entry = r.json()
 
-        return Result(Result.TABLEBASE, None, chess.Move.from_uci(entry[0]["uci"]))
+            if chess.Move.from_uci(entry[0]["uci"]) in board.legal_moves:
+                return Result(Result.TABLEBASE, Result.BOOK, chess.Move.from_uci(entry[0]["uci"]))
+        except:
+            pass
 
     start_time = time.time()
 

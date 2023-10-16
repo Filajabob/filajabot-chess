@@ -16,7 +16,7 @@ command = [
     "--hidden-import", "requests",
     "--distpath", "testing",
     "--name", f"version{version}",
-    "D:/PycharmProjects/FilajabotChess/search.py"
+    "search.py"
 ]
 
 try:
