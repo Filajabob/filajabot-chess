@@ -15,60 +15,34 @@ def evaluate(board) -> float:
             elif outcome.result() == "1/2-1/2":
                 return 0.0
     else:
+        # https://www.chessprogramming.org/PeSTO%27s_Evaluation_Function
+
+        game_phase = 0
+
+        mg_score = 0
+        eg_score = 0
+
         # If the game is not over, evaluate material / piece value table
-        white = board.occupied_co[chess.WHITE]
-        black = board.occupied_co[chess.BLACK]
-
-        material_score = (
-                Constants.PieceValues.PAWN * chess.popcount(white & board.pawns) - chess.popcount(black & board.pawns) +
-                Constants.PieceValues.KNIGHT * (chess.popcount(white & board.knights) - chess.popcount(black & board.knights)) +
-                Constants.PieceValues.BISHOP * (chess.popcount(white & board.bishops) - chess.popcount(black & board.bishops)) +
-                Constants.PieceValues.ROOK * (chess.popcount(white & board.rooks) - chess.popcount(black & board.rooks)) +
-                Constants.PieceValues.QUEEN * (chess.popcount(white & board.queens) - chess.popcount(black & board.queens))
-        )
-        if board.turn == chess.WHITE:
-            white_mobility = board.legal_moves.count()
-            board.push(chess.Move.null())
-            black_mobility = board.legal_moves.count()
-            board.pop()
-        else:
-            black_mobility = board.legal_moves.count()
-            board.push(chess.Move.null())
-            white_mobility = board.legal_moves.count()
-            board.pop()
-
-        mobility_score = Constants.PieceValues.MOBILITY * (white_mobility - black_mobility)
-
-        piece_value_table_score = 0
-
         for square in chess.SQUARES:
             piece = board.piece_at(square)
-
             if piece is not None:
-                if piece.color:
-                    # If the piece is white
-                    if piece.piece_type == chess.KING:
-                        if utils.is_endgame(board):
-                            # In end-game, consult end-game table
-                            piece_value_table_score += \
-                                Constants.PIECE_VALUE_TABLES[str(piece.piece_type)]["end_game"][63 - square] / 100
-                        else:
-                            # In middle/opening (opening will use the opening book), use middle-game table
-                            piece_value_table_score += \
-                                Constants.PIECE_VALUE_TABLES[str(piece.piece_type)]["middle_game"][63 - square] / 100
-                    else:
-                        piece_value_table_score += Constants.PIECE_VALUE_TABLES[str(piece.piece_type)][63 - square] / 100
-                else:
-                    if piece.piece_type == chess.KING:
-                        if utils.is_endgame(board):
-                            # In end-game, consult end-game table
-                            piece_value_table_score -= \
-                                Constants.PIECE_VALUE_TABLES[str(piece.piece_type)]["end_game"][square] / 100
-                        else:
-                            # In middle/opening (opening will use the opening book), use middle-game table
-                            piece_value_table_score -= \
-                                Constants.PIECE_VALUE_TABLES[str(piece.piece_type)]["middle_game"][square] / 100
-                    else:
-                        piece_value_table_score -= Constants.PIECE_VALUE_TABLES[str(piece.piece_type)][square] / 100
+                if piece.color is chess.WHITE:
+                    mg_score += Constants.PieceValues.MIDDLE_GAME[str(piece.piece_type)] + \
+                                Constants.PIECE_TABLES[piece.color]["mg"][str(piece.piece_type)][square]
 
-        return material_score + mobility_score + piece_value_table_score
+                    eg_score += Constants.PieceValues.END_GAME[str(piece.piece_type)] + \
+                                Constants.PIECE_TABLES[piece.color]["eg"][str(piece.piece_type)][square]
+                else:
+                    mg_score -= Constants.PieceValues.MIDDLE_GAME[str(piece.piece_type)] + \
+                                Constants.PIECE_TABLES[piece.color]["mg"][str(piece.piece_type)][square]
+
+                    eg_score -= Constants.PieceValues.END_GAME[str(piece.piece_type)] + \
+                                Constants.PIECE_TABLES[piece.color]["eg"][str(piece.piece_type)][square]
+
+                game_phase += Constants.GAME_PHASE_INC[piece.piece_type - 1]
+
+        # tapered eval
+        mg_phase = max(game_phase, 24)  # in case of early promotion
+        eg_phase = 24 - mg_phase
+
+        return (mg_score * mg_phase + eg_score * eg_phase) / 24

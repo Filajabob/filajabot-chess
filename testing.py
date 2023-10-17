@@ -1,4 +1,5 @@
 import subprocess
+import statistics
 import datetime
 import time
 import chess
@@ -21,6 +22,8 @@ engine2_wins = 0
 draws = 0
 
 game_board = display.start(chess.Board().fen())
+
+times = []
 
 for i in range(iterations):
     if display.check_for_quit():
@@ -47,6 +50,9 @@ for i in range(iterations):
 
                 if move not in [board.san(move) for move in board.legal_moves]:
                     print(f"Game complete in {round(time.time() - start_time, 2)} seconds.")
+                    times.append(time.time() - start_time)
+                    print(
+                        f"Mean: {statistics.mean(times)} | Median: {statistics.median(times)} | Mode: {statistics.mode(times)}")
                     engine2_wins += 1
                     break
             else:
@@ -59,6 +65,9 @@ for i in range(iterations):
 
                 if move not in [board.san(move) for move in board.legal_moves]:
                     print(f"Game complete in {round(time.time() - start_time, 2)} seconds.")
+                    times.append(time.time() - start_time)
+                    print(
+                        f"Mean: {statistics.mean(times)} | Median: {statistics.median(times)} | Mode: {statistics.mode(times)}")
                     engine1_wins += 1
                     break
 
@@ -67,6 +76,9 @@ for i in range(iterations):
 
         else:
             print(f"Game complete in {round(time.time() - start_time, 2)} seconds.")
+            times.append(time.time() - start_time)
+            print(
+                f"Mean: {statistics.mean(times)} | Median: {statistics.median(times)} | Mode: {statistics.mode(times)}")
             result = board.result()
 
             if result == "1-0":
@@ -90,6 +102,9 @@ for i in range(iterations):
 
                 if move not in [board.san(move) for move in board.legal_moves]:
                     print(f"Game complete in {round(time.time() - start_time, 2)} seconds.")
+                    times.append(time.time() - start_time)
+                    print(
+                        f"Mean: {statistics.mean(times)} | Median: {statistics.median(times)} | Mode: {statistics.mode(times)}")
                     engine1_wins += 1
                     break
             else:
@@ -102,6 +117,9 @@ for i in range(iterations):
 
                 if move not in [board.san(move) for move in board.legal_moves]:
                     print(f"Game complete in {round(time.time() - start_time, 2)} seconds.")
+                    times.append(time.time() - start_time)
+                    print(
+                        f"Mean: {statistics.mean(times)} | Median: {statistics.median(times)} | Mode: {statistics.mode(times)}")
                     engine2_wins += 1
                     break
 
@@ -110,6 +128,9 @@ for i in range(iterations):
 
         else:
             print(f"Game complete in {round(time.time() - start_time, 2)} seconds.")
+            times.append(time.time() - start_time)
+            print(
+                f"Mean: {statistics.mean(times)} | Median: {statistics.median(times)} | Mode: {statistics.mode(times)}")
             result = board.result()
 
             if result == "1-0":
