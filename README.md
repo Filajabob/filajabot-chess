@@ -3,7 +3,7 @@
 ## Overview
 
 Filajabot is a Python chess engine which can interactively play chess with a human 
-(cli.py) or calculate the best move from a FEN string (via search.py).
+(cli.py) or calculate the best move from a FEN string (via search.py). You're probably better off with Stockfish tho
 
 ## Utilizes
 
@@ -11,6 +11,8 @@ Filajabot is a Python chess engine which can interactively play chess with a hum
 - Move ordering (MVV-LVA, SEE)
 - Robust evaluation at leaf nodes (middle-game/end-game dynamic values, piece tables)
   - See more about Filajabot's evaluation here: [PeSTO](https://www.chessprogramming.org/PeSTO%27s_Evaluation_Function)
+- Opening and Endgame book/tablebase probing
+- More to come
 
 ## Features
 - Interactive CLI to play against the bot (cli.py)
@@ -31,8 +33,11 @@ Filajabot is a Python chess engine which can interactively play chess with a hum
 
 #### Executable (.EXE)
 1. Navigate to the Releases panel and select the latest release.
-2. Install the EXE file.
-3. Run the file. If the program closes immediately, try **Source Code**, then insert the executable into the source code directory.
+2. Install the executable(s) you wish to use.
+3. Install the source code.
+4. Navigate to your downloaded files. Decompress and open the source code.
+5. Insert the exectuable(s) into the source code folder.
+6. You can now run the exectuable(s) as you wish. You may also create a shortcut for easier access.
 
 #### Source Code
 1. Navigate to the Releases panel and select the latest release.
@@ -41,4 +46,4 @@ Filajabot is a Python chess engine which can interactively play chess with a hum
 4. Confirm you have installed all **Prerequisites**.
 5. Run `cli.py` for an interactive game.
 
-You can choose to run `search.py [FEN] [max_time]` for a single position evaluation.
+You can choose to run `search.py [FEN] [max_time]` or `FilajabotAPI_v021_beta.exe [FEN] [max_time]` for a single position evaluation.
