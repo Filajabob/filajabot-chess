@@ -3,8 +3,8 @@ import chess
 
 
 class Constants:
-    DEPTH = 5  # Maximum depth
-    SEARCH_TIME = 3  # Maximum search time
+    DEPTH = 4  # Maximum depth
+    SEARCH_TIME = 1.5  # Maximum search time
     BIG_DELTA = 9.75  # https://www.chessprogramming.org/Delta_Pruning
 
     class PieceValues:
