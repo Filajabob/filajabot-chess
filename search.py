@@ -12,6 +12,7 @@ from constants import Constants
 from logger import filajabot_logger
 from result import Result
 
+
 def opening_book(board) -> chess.Move:
     """
     Probes an opening book and returns a random opening move.
@@ -42,7 +43,6 @@ def search(board, *, log=True, max_depth=Constants.DEPTH, max_time=Constants.SEA
     if book:
         return Result(Result.BOOK, Result.BOOK, book, None, best_move_san=board.san(book))
     if sum([1 for square in chess.SQUARES if board.piece_at(square) is not None]) <= 7:
-        # TODO: find out why 0.1.2 is worse than 0.1.1 (added tablebase probing)
         # probe tablebase
         try:
             r = requests.get(url=f"http://tablebase.lichess.ovh/standard/mainline?fen={board.fen()}")

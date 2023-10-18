@@ -1,2 +1,4 @@
-chess==1.9.0
+chess~=1.10.0
 chessboard==1.5.4  # only required for testing.py
+pygame~=2.5.2
+requests~=2.31.0

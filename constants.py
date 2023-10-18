@@ -5,9 +5,11 @@ import chess
 class Constants:
     DEPTH = 5  # Maximum depth
     SEARCH_TIME = 3  # Maximum search time
+    BIG_DELTA = 9.75  # https://www.chessprogramming.org/Delta_Pruning
 
     class PieceValues:
-        # Thanks to https://www.chessprogramming.org/Simplified_Evaluation_Function and https://www.chessprogramming.org/PeSTO%27s_Evaluation_Function
+        # Thanks to https://www.chessprogramming.org/Simplified_Evaluation_Function and
+        # https://www.chessprogramming.org/PeSTO%27s_Evaluation_Function
         KING = float("inf")
         QUEEN = 9
         ROOK = 5

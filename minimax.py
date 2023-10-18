@@ -3,13 +3,14 @@ import chess
 from evaluate import evaluate
 from result import Result
 import utils
+from quiescence_search import quiescence_search
 
 
 def maxi(depth, board, alpha, beta) -> Result:
     nodes_searched = 0
 
     if depth == 0:
-        return Result(evaluate(board), depth, None, 1)
+        return Result(quiescence_search(board, alpha, beta), depth, None, 1)
 
     best_move = chess.Move.null()
 
@@ -34,7 +35,7 @@ def mini(depth, board, alpha, beta) -> Result:
     nodes_searched = 0
 
     if depth == 0:
-        return Result(evaluate(board), depth, None, 1)
+        return Result(quiescence_search(board, alpha, beta), depth, None, 1)
 
     best_move = chess.Move.null()
 
