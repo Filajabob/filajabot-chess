@@ -3,7 +3,7 @@
 ## Overview
 
 Filajabot is a Python chess engine which can interactively play chess with a human 
-(cli.py) or calculate the best move from a FEN string (via search.py). You're probably better off with Stockfish tho
+(cli.py or gui.py) or calculate the best move from a FEN string (via search.py). You're probably better off with Stockfish tho
 
 ## Utilizes
 
@@ -12,10 +12,12 @@ Filajabot is a Python chess engine which can interactively play chess with a hum
 - Robust evaluation at leaf nodes (middle-game/end-game dynamic values, piece tables)
   - See more about Filajabot's evaluation here: [PeSTO](https://www.chessprogramming.org/PeSTO%27s_Evaluation_Function)
 - Opening and Endgame book/tablebase probing
+- Quiescent search
 - More to come
 
 ## Features
 - Interactive CLI to play against the bot (cli.py)
+- GUI to play against the bot (.exe coming soon!)
 - API for best move from a FEN string (search.py)
 
 ## Getting Started
