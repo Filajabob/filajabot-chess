@@ -11,7 +11,7 @@ class Result:
         :param best_move: The best move for the player to move found by the search
         :param nodes: The amount of nodes searched
         :param best_move_san: The best move, in SAN format
-        :param mate_in: The shortest amount of half-moves until checkmate, for the player that the score is in favor for
+        :param mate_in: The shortest amount of half-moves until checkmate, positive in favor for white, and vice versa.
         """
         self.score = score
         self.depth = depth

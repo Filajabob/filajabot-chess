@@ -74,6 +74,9 @@ def main(board, engine_color):
             board.push(result.best_move)
             screen.fill(BROWN)
 
+            if result.mate_in:
+                print(f"M{result.mate_in}")
+
             print(f"Depth: {result.depth} | Score: {result.score} | Move: {san}")
 
         else:
@@ -133,10 +136,6 @@ def main(board, engine_color):
             outcome = board.outcome()
             print(f"Termination: {outcome.termination}")
             print(f"FEN: {board.fen()}")
-
-            while True:
-                if pygame.event.get() == pygame.QUIT:
-                    break
 
             status = False
             print(board)

@@ -58,9 +58,9 @@ def search(board, *, log=True, max_depth=Constants.DEPTH, max_time=Constants.SEA
     for depth in range(1, max_depth):
         # Engine is white
         if board.turn == chess.WHITE:
-            result = maxi(depth, board, float("-inf"), float("inf"))
+            result = maxi(depth, board, float("-inf"), float("inf"), 1)
         else:
-            result = mini(depth, board, float("-inf"), float("inf"))
+            result = mini(depth, board, float("-inf"), float("inf"), 1)
 
         elapsed_time = time.time() - start_time
 
@@ -93,7 +93,13 @@ def search(board, *, log=True, max_depth=Constants.DEPTH, max_time=Constants.SEA
                                   f"\tElapsed time: {elapsed_time}\n"
                                   f"\tTime per 100 nodes: {elapsed_time / result.nodes * 100}")
 
-    return Result(result.score, max_depth, result.best_move, None, best_move_san=board.san(result.best_move))
+    mate_in = None
+    if result.score > Constants.SCORE_MATE - Constants.DEEPEST_MATE \
+            or result.score < -Constants.SCORE_MATE + Constants.DEEPEST_MATE:
+        mate_in = Constants.SCORE_MATE - result.score
+
+    return Result(result.score, max_depth, result.best_move, None, best_move_san=board.san(result.best_move),
+                  mate_in=mate_in)
 
 
 if __name__ == '__main__':

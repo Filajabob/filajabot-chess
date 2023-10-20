@@ -3,11 +3,12 @@ import chess
 
 
 class Constants:
-    DEPTH = 4  # Maximum depth
+    DEPTH = 6  # Maximum depth
     SEARCH_TIME = 1.5  # Maximum search time
     BIG_DELTA = 9.75  # https://www.chessprogramming.org/Delta_Pruning
     ZOBRIST_BITS = 64
     SCORE_MATE = 20000
+    DEEPEST_MATE = 50
 
     class PieceValues:
         # Thanks to https://www.chessprogramming.org/Simplified_Evaluation_Function and

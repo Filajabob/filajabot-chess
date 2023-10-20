@@ -9,9 +9,9 @@ def evaluate(board) -> float:
         # If the game is over, return inf/-inf or 0
         if outcome.result() in ["1-0", "0-1", "1/2-1/2"]:
             if outcome.result() == "1-0":
-                return float("inf")
+                return Constants.SCORE_MATE
             elif outcome.result() == "0-1":
-                return float("-inf")
+                return -Constants.SCORE_MATE
             elif outcome.result() == "1/2-1/2":
                 return 0.0
     else:

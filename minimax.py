@@ -7,11 +7,12 @@ from result import Result
 import utils
 from quiescence_search import quiescence_search
 from transposition_table import TranspositionTable
+from constants import Constants
 
 tt = TranspositionTable()
 
 
-def maxi(depth, board, alpha, beta, zobrist_hash=None) -> Result:
+def maxi(depth, board, alpha, beta, root_dist, zobrist_hash=None) -> Result:
     if not zobrist_hash:
         zobrist_hash = tt.zobrist_array.positional_hash(board)
 
@@ -25,6 +26,7 @@ def maxi(depth, board, alpha, beta, zobrist_hash=None) -> Result:
 
     if depth == 0 or board.outcome():
         result = Result(quiescence_search(board, alpha, beta), depth, None, 1)
+
         return result
 
     ordered_moves = utils.order_moves(board, board.legal_moves)
@@ -32,11 +34,33 @@ def maxi(depth, board, alpha, beta, zobrist_hash=None) -> Result:
     for move in ordered_moves:
         zobrist_hash = tt.zobrist_array.push(zobrist_hash, move, board)
         board.push(move)
-        result = mini(depth - 1, board, alpha, beta, zobrist_hash)   # Find the opponent's (black's) best move
+        result = mini(depth - 1, board, alpha, beta, root_dist + 1, zobrist_hash)   # Find the opponent's (black's) best move
         board.pop()
         zobrist_hash = tt.zobrist_array.pop(zobrist_hash, move, board)
 
         nodes_searched += result.nodes
+
+        # Mate Distance Pruning
+
+        if result.score == Constants.SCORE_MATE:
+            result.score -= 1
+
+            mating_value = Constants.SCORE_MATE - root_dist
+
+            if mating_value < beta:
+                beta = mating_value
+                if alpha >= mating_value:
+                    return Result(mating_value, depth, best_move)
+
+        elif result.score == -Constants.SCORE_MATE:
+            result.score += 1
+
+            mating_value = -Constants.SCORE_MATE + root_dist
+
+            if mating_value > alpha:
+                alpha = mating_value
+                if beta <= mating_value:
+                    return Result(mating_value, depth, best_move)
 
         if result.score >= beta:
             best_move = move
@@ -53,7 +77,7 @@ def maxi(depth, board, alpha, beta, zobrist_hash=None) -> Result:
     return result
 
 
-def mini(depth, board, alpha, beta, zobrist_hash=None) -> Result:
+def mini(depth, board, alpha, beta, root_dist, zobrist_hash=None) -> Result:
     if not zobrist_hash:
         zobrist_hash = tt.zobrist_array.positional_hash(board)
 
@@ -74,7 +98,7 @@ def mini(depth, board, alpha, beta, zobrist_hash=None) -> Result:
     for move in ordered_moves:
         zobrist_hash = tt.zobrist_array.push(zobrist_hash, move, board)
         board.push(move)
-        result = maxi(depth - 1, board, alpha, beta, zobrist_hash)
+        result = maxi(depth - 1, board, alpha, beta, root_dist + 1, zobrist_hash)
         board.pop()
         zobrist_hash = tt.zobrist_array.pop(zobrist_hash, move, board)
 
