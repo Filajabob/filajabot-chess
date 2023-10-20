@@ -78,12 +78,20 @@ def search(board, *, log=True, max_depth=Constants.DEPTH, max_time=Constants.SEA
                       engine_resign=True)
 
     if log:
-        filajabot_logger.info(f"Search completed at {board.fen()} at depth {max_depth}\n"
-                              f"\tBest move: {result.best_move}\n"
-                              f"\tScore: {result.score}"
-                              f"\tNodes searched: {result.nodes}\n"
-                              f"\tElapsed time: {elapsed_time}\n"
-                              f"\tTime per 100 nodes: {elapsed_time / result.nodes * 100}")
+        if result.nodes == 0:
+            filajabot_logger.info(f"Search completed at {board.fen()} at depth {max_depth}\n"
+                                  f"\tBest move: {result.best_move}\n"
+                                  f"\tScore: {result.score}"
+                                  f"\tNodes searched: {result.nodes}\n"
+                                  f"\tElapsed time: {elapsed_time}\n"
+                                  f"\tTime per 100 nodes: N/A")
+        else:
+            filajabot_logger.info(f"Search completed at {board.fen()} at depth {max_depth}\n"
+                                  f"\tBest move: {result.best_move}\n"
+                                  f"\tScore: {result.score}"
+                                  f"\tNodes searched: {result.nodes}\n"
+                                  f"\tElapsed time: {elapsed_time}\n"
+                                  f"\tTime per 100 nodes: {elapsed_time / result.nodes * 100}")
 
     return Result(result.score, max_depth, result.best_move, None, best_move_san=board.san(result.best_move))
 

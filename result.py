@@ -22,6 +22,7 @@ class Result:
         self.elapsed_time = elapsed_time
         self.engine_resign = engine_resign
 
+
     BOOK = None
     TABLEBASE = None
     DRAW = 0

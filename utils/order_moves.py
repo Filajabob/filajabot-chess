@@ -3,9 +3,6 @@ from .get_piece_value import get_piece_value
 from .see import see, see_capture
 
 
-
-
-
 def score_move(move, board):
     if board.is_capture(move):
         # Use MVV-LVA

@@ -1,56 +1,95 @@
 import random
 import chess
+
+import logger
 from evaluate import evaluate
 from result import Result
 import utils
 from quiescence_search import quiescence_search
+from transposition_table import TranspositionTable
+
+tt = TranspositionTable()
 
 
-def maxi(depth, board, alpha, beta) -> Result:
+def maxi(depth, board, alpha, beta, zobrist_hash=None) -> Result:
+    if not zobrist_hash:
+        zobrist_hash = tt.zobrist_array.positional_hash(board)
+
     nodes_searched = 0
 
-    if depth == 0:
-        return Result(quiescence_search(board, alpha, beta), depth, None, 1)
+    entry = tt.probe(zobrist_hash)
+    if entry:
+        if entry.depth >= depth and entry.best_move:
+            logger.filajabot_logger.debug(f"Entry from TT was used: {entry.result().best_move}")
+            return entry.result()
 
-    best_move = chess.Move.null()
+    if depth == 0 or board.outcome():
+        result = Result(quiescence_search(board, alpha, beta), depth, None, 1)
+        return result
 
-    for move in utils.order_moves(board, board.legal_moves):
+    ordered_moves = utils.order_moves(board, board.legal_moves)
+    best_move = ordered_moves[0]  # just in case
+    for move in ordered_moves:
+        zobrist_hash = tt.zobrist_array.push(zobrist_hash, move, board)
         board.push(move)
-        result = mini(depth - 1, board, alpha, beta)   # Find the opponent's (black's) best move
+        result = mini(depth - 1, board, alpha, beta, zobrist_hash)   # Find the opponent's (black's) best move
         board.pop()
+        zobrist_hash = tt.zobrist_array.pop(zobrist_hash, move, board)
 
         nodes_searched += result.nodes
 
         if result.score >= beta:
             best_move = move
-            return Result(beta, depth, best_move, nodes_searched)  # fail hard beta-cutoff
+            result = Result(beta, depth, best_move, nodes_searched)
+            tt.generate_add_entry(result, board, alpha, beta, zobrist_hash)
+
+            return result  # fail hard beta-cutoff
         if result.score > alpha:
             alpha = result.score
             best_move = move
 
-    return Result(alpha, depth, best_move, nodes_searched)
+    result = Result(alpha, depth, best_move, nodes_searched)
+    tt.generate_add_entry(result, board, alpha, beta, zobrist_hash)
+    return result
 
 
-def mini(depth, board, alpha, beta) -> Result:
+def mini(depth, board, alpha, beta, zobrist_hash=None) -> Result:
+    if not zobrist_hash:
+        zobrist_hash = tt.zobrist_array.positional_hash(board)
+
     nodes_searched = 0
 
-    if depth == 0:
-        return Result(quiescence_search(board, alpha, beta), depth, None, 1)
+    entry = tt.probe(zobrist_hash)
+    if entry:
+        if entry.depth >= depth and entry.best_move:
+            logger.filajabot_logger.debug(f"Entry from TT was used: {entry.result().best_move}")
+            return entry.result()
 
-    best_move = chess.Move.null()
+    if depth == 0 or board.outcome():
+        result = Result(quiescence_search(board, alpha, beta), depth, None, 1)
+        return result
 
-    for move in utils.order_moves(board, board.legal_moves):
+    ordered_moves = utils.order_moves(board, board.legal_moves)
+    best_move = ordered_moves[0]  # just in case
+    for move in ordered_moves:
+        zobrist_hash = tt.zobrist_array.push(zobrist_hash, move, board)
         board.push(move)
-        result = maxi(depth - 1, board, alpha, beta)
+        result = maxi(depth - 1, board, alpha, beta, zobrist_hash)
         board.pop()
+        zobrist_hash = tt.zobrist_array.pop(zobrist_hash, move, board)
 
         nodes_searched += result.nodes
 
         if result.score <= alpha:
             best_move = move
-            return Result(alpha, depth, best_move, nodes_searched)  # fail hard alpha-cutoff
+            result = Result(alpha, depth, best_move, nodes_searched)
+            tt.generate_add_entry(result, board, alpha, beta, zobrist_hash)
+
+            return result  # fail hard beta-cutoff
         if result.score < beta:
             beta = result.score
             best_move = move
 
-    return Result(beta, depth, best_move, nodes_searched)
+    result = Result(beta, depth, best_move, nodes_searched)
+    tt.generate_add_entry(result, board, alpha, beta, zobrist_hash)
+    return result

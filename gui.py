@@ -70,10 +70,11 @@ def main(board, engine_color):
 
         if board.turn == engine_color:
             result = search(board)
+            san = board.san(result.best_move)
             board.push(result.best_move)
             screen.fill(BROWN)
 
-            print(f"Depth: {result.depth} | Score: {result.score}")
+            print(f"Depth: {result.depth} | Score: {result.score} | Move: {san}")
 
         else:
             for event in pygame.event.get():
@@ -129,7 +130,14 @@ def main(board, engine_color):
 
         # deactivates the pygame library
         if board.outcome() is not None:
-            print(board.outcome())
+            outcome = board.outcome()
+            print(f"Termination: {outcome.termination}")
+            print(f"FEN: {board.fen()}")
+
+            while True:
+                if pygame.event.get() == pygame.QUIT:
+                    break
+
             status = False
             print(board)
 
