@@ -13,7 +13,7 @@ def evaluate(board) -> float:
             elif outcome.result() == "0-1":
                 return -Constants.SCORE_MATE
             elif outcome.result() == "1/2-1/2":
-                return 0.0
+                return Constants.CONTEMPT
     else:
         # https://www.chessprogramming.org/PeSTO%27s_Evaluation_Function
 

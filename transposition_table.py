@@ -1,9 +1,11 @@
 import random
 import time
+import sys
 import chess
 from constants import Constants
 import utils
 from result import Result
+from logger import filajabot_logger
 
 
 class TranspositionTable:
@@ -21,12 +23,19 @@ class TranspositionTable:
         return entry
 
     def add_entry(self, entry):
+        if entry.zobrist_hash in self.entries:
+            # We will do a depth-preferred replacement scheme for simplicity -
+            # https://www.chessprogramming.org/Transposition_Table
+            if self.entries[entry.zobrist_hash].depth > entry.depth:
+                return
+
         self.entries[entry.zobrist_hash] = entry
 
     def generate_add_entry(self, result: Result, board, alpha, beta, zobrist_hash, move=None):
         self.add_entry(self.generate_entry(result, board, alpha, beta, zobrist_hash, move))
 
     def probe(self, zobrist_hash):
+        """Probes the transposition table for a zobrist_hash"""
         if zobrist_hash not in self.entries:
             return None
         else:

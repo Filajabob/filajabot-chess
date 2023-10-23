@@ -1,10 +1,14 @@
 """
 Thanks to https://blog.devgenius.io/simple-interactive-chess-gui-in-python-c6d6569f7b6c for all the code
 """
+import time
+import threading
 
 import pygame
 import chess
 import math
+
+import utils
 from search import search
 
 # initialise display
@@ -12,6 +16,8 @@ X = 800
 Y = 800
 screen = pygame.display.set_mode((X, Y))
 pygame.init()
+
+search_done = False
 
 # basic colours
 WHITE = (255, 255, 255)
@@ -54,11 +60,12 @@ def update(screen, board):
     pygame.display.flip()
 
 
+
 def main(board, engine_color):
     # make background black
     screen.fill(BROWN)
     # name window
-    pygame.display.set_caption('Chess')
+    pygame.display.set_caption('Filajabot GUI')
 
     # variable to be used later
     index_moves = []
@@ -69,7 +76,9 @@ def main(board, engine_color):
         update(screen, board)
 
         if board.turn == engine_color:
-            result = search(board)
+            start = time.time()
+
+            result = search(board, use_pygame_sleep=True)
             san = board.san(result.best_move)
             board.push(result.best_move)
             screen.fill(BROWN)
@@ -77,7 +86,8 @@ def main(board, engine_color):
             if result.mate_in:
                 print(f"M{result.mate_in}")
 
-            print(f"Depth: {result.depth} | Score: {result.score} | Move: {san}")
+            print(f"Depth: {result.depth} | Score: {utils.smart_round(result.score, 2)} | Move: {san} | "
+                  f"Elapsed: {round(time.time() - start, 2)}s")
 
         else:
             for event in pygame.event.get():

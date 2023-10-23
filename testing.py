@@ -1,4 +1,5 @@
 import subprocess
+import os
 import statistics
 import datetime
 import time
@@ -8,6 +9,8 @@ from chessboard import display
 
 engine1 = input("Select engine #1 name: ")
 engine2 = input("Select engine #2 name: ")
+
+auto_shutoff = input("Automatically shut-off computer after testing? (Y/n) ") == "Y"
 
 engine1_fp = f"testing/{engine1}.exe"
 engine2_fp = f"testing/{engine2}.exe"
@@ -154,4 +157,7 @@ with open(f"testing/results/{engine1}-{engine2}-{datetime.datetime.now().strftim
 
     json.dump(data, f, indent=4)
 
-display.terminate()
+if not auto_shutoff:
+    display.terminate()
+else:
+    os.system("shutdown /s /t 1")

@@ -3,7 +3,9 @@ Run this file directly while passing a FEN string to get a result.Result
 """
 
 import time
+import asyncio
 import sys
+import multiprocessing as mp
 import chess
 import chess.polyglot
 import requests
@@ -11,6 +13,11 @@ from minimax import mini, maxi
 from constants import Constants
 from logger import filajabot_logger
 from result import Result
+
+try:
+    import pygame
+except ImportError:
+    print("WARNING: PyGame is not installed. Ignore if you do not use the GUI.")
 
 
 def opening_book(board) -> chess.Move:
@@ -28,9 +35,32 @@ def opening_book(board) -> chess.Move:
         return
 
 
-def search(board, *, log=True, max_depth=Constants.DEPTH, max_time=Constants.SEARCH_TIME) -> Result:
+def iterative_deepening(return_list, board, max_time, max_depth, log=True):
+    result = Result(None, 0, None)
+    start_time = time.time()
+
+    for depth in range(1, max_depth):
+        # Engine is white
+        if board.turn == chess.WHITE:
+            result = maxi(depth, board, float("-inf"), float("inf"), 1, best_move=result.best_move)
+        else:
+            result = mini(depth, board, float("-inf"), float("inf"), 1, best_move=result.best_move)
+
+        elapsed_time = time.time() - start_time
+
+        if log:
+            filajabot_logger.debug(f"Best move found in {round(elapsed_time, 2)} seconds at {board.fen()} on depth "
+                                   f"{depth}: {result.best_move}")
+
+        return_list[0] = result
+        if elapsed_time > max_time:
+            return result
+
+
+def search(board, *, log=True, max_depth=Constants.DEPTH, max_time=Constants.SEARCH_TIME, use_pygame_sleep=False) -> Result:
     """
     Conducts an iterative-deepening minimax search of a board, also including opening/endgame probing.
+    :param use_pygame_sleep:
     :param max_time:
     :param max_depth:
     :param log: bool: Whether to log
@@ -53,23 +83,21 @@ def search(board, *, log=True, max_depth=Constants.DEPTH, max_time=Constants.SEA
         except:
             pass
 
+    manager = mp.Manager()
+    return_list = manager.dict()
+
     start_time = time.time()
+    p = mp.Process(target=iterative_deepening, args=(return_list, board, max_time, max_depth, log))
+    p.start()
 
-    for depth in range(1, max_depth):
-        # Engine is white
-        if board.turn == chess.WHITE:
-            result = maxi(depth, board, float("-inf"), float("inf"), 1)
-        else:
-            result = mini(depth, board, float("-inf"), float("inf"), 1)
+    pygame.time.wait(max_time * 1000)
 
-        elapsed_time = time.time() - start_time
+    p.terminate()
+    p.join()
 
-        if log:
-            filajabot_logger.debug(f"Best move found in {round(elapsed_time, 2)} seconds at {board.fen()} on depth "
-                                   f"{depth}: {result.best_move}")
+    elapsed_time = time.time() - start_time
 
-        if elapsed_time > max_time:
-            break
+    result = return_list[0]
 
     if result.best_move is None:
         if log:
@@ -79,14 +107,14 @@ def search(board, *, log=True, max_depth=Constants.DEPTH, max_time=Constants.SEA
 
     if log:
         if result.nodes == 0:
-            filajabot_logger.info(f"Search completed at {board.fen()} at depth {max_depth}\n"
+            filajabot_logger.info(f"Search completed at {board.fen()} at depth {result.depth}\n"
                                   f"\tBest move: {result.best_move}\n"
                                   f"\tScore: {result.score}"
                                   f"\tNodes searched: {result.nodes}\n"
                                   f"\tElapsed time: {elapsed_time}\n"
                                   f"\tTime per 100 nodes: N/A")
         else:
-            filajabot_logger.info(f"Search completed at {board.fen()} at depth {max_depth}\n"
+            filajabot_logger.info(f"Search completed at {board.fen()} at depth {result.depth}\n"
                                   f"\tBest move: {result.best_move}\n"
                                   f"\tScore: {result.score}"
                                   f"\tNodes searched: {result.nodes}\n"
@@ -98,7 +126,7 @@ def search(board, *, log=True, max_depth=Constants.DEPTH, max_time=Constants.SEA
             or result.score < -Constants.SCORE_MATE + Constants.DEEPEST_MATE:
         mate_in = Constants.SCORE_MATE - result.score
 
-    return Result(result.score, max_depth, result.best_move, None, best_move_san=board.san(result.best_move),
+    return Result(result.score, result.depth, result.best_move, None, best_move_san=board.san(result.best_move),
                   mate_in=mate_in)
 
 

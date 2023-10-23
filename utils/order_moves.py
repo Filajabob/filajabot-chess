@@ -26,7 +26,7 @@ def score_move(move, board):
         return 0
 
 
-def order_moves(board, moves):
+def order_moves(board, moves, best_move=None):
     scored_moves = []
 
     for move in moves:
@@ -34,5 +34,9 @@ def order_moves(board, moves):
 
     sorted_scored_moves = sorted(scored_moves, key=lambda x: x[1], reverse=True)
     scored_moves = [move[0] for move in sorted_scored_moves]
+
+    if best_move:
+        scored_moves.remove(best_move)
+        scored_moves.insert(0, best_move)
 
     return scored_moves
