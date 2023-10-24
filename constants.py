@@ -9,7 +9,7 @@ class Constants:
     ZOBRIST_BITS = 64
     SCORE_MATE = 20000
     DEEPEST_MATE = 50
-    CONTEMPT = 0.25  # Higher value indicates less draws, and vice versa
+    CONTEMPT = -0.2  # Higher value indicates more draws, and vice versa
 
     class PieceValues:
         # Thanks to https://www.chessprogramming.org/Simplified_Evaluation_Function and

@@ -35,7 +35,7 @@ def opening_book(board) -> chess.Move:
         return
 
 
-def iterative_deepening(return_list, board, max_time, max_depth, log=True):
+def iterative_deepening(board, max_time, max_depth, log=True):
     result = Result(None, 0, None)
     start_time = time.time()
 
@@ -52,7 +52,6 @@ def iterative_deepening(return_list, board, max_time, max_depth, log=True):
             filajabot_logger.debug(f"Best move found in {round(elapsed_time, 2)} seconds at {board.fen()} on depth "
                                    f"{depth}: {result.best_move}")
 
-        return_list[0] = result
         if elapsed_time > max_time:
             return result
 
@@ -83,21 +82,7 @@ def search(board, *, log=True, max_depth=Constants.DEPTH, max_time=Constants.SEA
         except:
             pass
 
-    manager = mp.Manager()
-    return_list = manager.dict()
-
-    start_time = time.time()
-    p = mp.Process(target=iterative_deepening, args=(return_list, board, max_time, max_depth, log))
-    p.start()
-
-    pygame.time.wait(max_time * 1000)
-
-    p.terminate()
-    p.join()
-
-    elapsed_time = time.time() - start_time
-
-    result = return_list[0]
+    result = iterative_deepening(board, max_time, max_depth, log)
 
     if result.best_move is None:
         if log:
